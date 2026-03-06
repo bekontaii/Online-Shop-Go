@@ -7,6 +7,8 @@ type Repository interface {
 	GetUserByEmail(email string) (*User, error)
 }
 
+var ErrUserNotFound = errors.New("user not found")
+
 type InMemoryRepository struct {
 	users map[string]*User
 }
@@ -29,7 +31,7 @@ func (r *InMemoryRepository) CreateUser(user *User) (*User, error) {
 func (r *InMemoryRepository) GetUserByEmail(email string) (*User, error) {
 	user, ok := r.users[email]
 	if !ok {
-		return nil, errors.New("user not found")
+		return nil, ErrUserNotFound
 	}
 
 	return user, nil

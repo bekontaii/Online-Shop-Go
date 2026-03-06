@@ -1,4 +1,4 @@
-module github.com/bekontaii/Online-Shop-Go.git
+module github.com/bekontaii/Online-Shop-Go
 
 go 1.25.7
 
