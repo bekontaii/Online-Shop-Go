@@ -3,15 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/bekontaii/Online-Shop-Go/internal/user"
+	"github.com/bekontaii/Online-Shop-Go/pkg/database"
 	"net/http"
 )
 
 func main() {
-	fmt.Println("Pet Project Online Shop")
-	repo := user.NewInMemoryRepository()
+	db := database.NewPostgresDB()
+
+	repo := user.NewPostgresRepository(db)
+
 	service := user.NewService(repo)
+
 	handler := user.NewHandler(service)
-	router := http.NewServeMux()
-	handler.RegisterRoutes(router)
-	http.ListenAndServe(":8080", router)
+
+	mux := http.NewServeMux()
+
+	handler.RegisterRoutes(mux)
+	fmt.Println("Server started on port 8080")
+	http.ListenAndServe(":8080", mux)
 }
