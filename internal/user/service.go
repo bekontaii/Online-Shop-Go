@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"github.com/bekontaii/Online-Shop-Go/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -36,15 +37,18 @@ func (s *Service) Register(user *User) (*User, error) {
 	createdUser.Password = ""
 	return createdUser, nil
 }
-func (s *Service) Login(email string, password string) (*User, error) {
+func (s *Service) Login(email string, password string) (string, error) {
 	user, err := s.repo.GetUserByEmail(email)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, errors.New("username or password is incorrect")
+		return "", errors.New("username or password is incorrect")
 	}
-	user.Password = ""
-	return user, nil
+	token, err := jwt.GenerateToken(user.ID, user.Email, user.Role)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
