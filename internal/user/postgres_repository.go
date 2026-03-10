@@ -19,7 +19,7 @@ func (repo *PostgresRepository) CreateUser(user *User) (*User, error) {
 	query := `
 	INSERT INTO users (username, email, password, role)
 	VALUES ($1,$2,$3,$4)
-	RETURNING username,email,role
+	RETURNING id, username, email, role
 	`
 
 	err := repo.db.QueryRow(
@@ -29,6 +29,7 @@ func (repo *PostgresRepository) CreateUser(user *User) (*User, error) {
 		user.Password,
 		user.Role,
 	).Scan(
+		&user.ID,
 		&user.Username,
 		&user.Email,
 		&user.Role,
@@ -46,12 +47,13 @@ func (repo *PostgresRepository) GetUserByEmail(email string) (*User, error) {
 	var user User
 
 	query := `
-	SELECT username,email,password,role
+	SELECT id,username,email,password,role
 	FROM users
 	WHERE email=$1
 	`
 
 	err := repo.db.QueryRow(query, email).Scan(
+		&user.ID,
 		&user.Username,
 		&user.Email,
 		&user.Password,

@@ -46,20 +46,30 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+
 	var req auth.LoginRequest
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	defer r.Body.Close()
-	user, err := h.service.Login(req.Email, req.Password)
+
+	token, err := h.service.Login(req.Email, req.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(user); err != nil {
+
+	resp := map[string]string{
+		"token": token,
+	}
+
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
