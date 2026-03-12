@@ -16,7 +16,6 @@ func JWTMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 
-		authHeader = strings.Split(authHeader, " ")[len(strings.Split(authHeader, " "))-1]
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
