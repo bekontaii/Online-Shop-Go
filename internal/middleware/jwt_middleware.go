@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"context"
+	"github.com/bekontaii/Online-Shop-Go/pkg/jwt"
 	"net/http"
 	"strings"
 )
@@ -26,5 +28,12 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		token := parts[1]
+		userID, _, _, err := jwt.ValidateToken(token)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+		ctx := context.WithValue(r.Context(), "user_id", userID)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
