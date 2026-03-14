@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+type contextKey string
+
+const UserIDKey contextKey = "user_id"
+
 func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -15,8 +19,6 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-
-		next.ServeHTTP(w, r)
 
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 {
@@ -33,7 +35,8 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "user_id", userID)
+		ctx := context.WithValue(r.Context(), UserIDKey, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
+
 	})
 }
