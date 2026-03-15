@@ -17,5 +17,5 @@ func (r *PostgresRepository) GetCartByUserID(userID int) ([]CartItem, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
+	var items []CartItem
 }
