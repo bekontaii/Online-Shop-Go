@@ -32,3 +32,6 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
+func (h *Handler) CartHandler(mux *http.ServeMux) {
+	mux.HandleFunc("/api/cart", middleware.JWTMiddleware(h.GetCart))
+}
