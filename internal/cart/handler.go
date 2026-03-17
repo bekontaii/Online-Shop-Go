@@ -31,7 +31,11 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(items); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+
 }
 func (h *Handler) CartHandler(mux *http.ServeMux) {
-	mux.HandleFunc("/api/cart", middleware.JWTMiddleware(h.GetCart))
+	mux.Handle(
+		"/api/cart",
+		middleware.JWTMiddleware(http.HandlerFunc(h.GetCart)),
+	)
 }
