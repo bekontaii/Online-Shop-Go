@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"github.com/bekontaii/Online-Shop-Go/pkg/jwt"
+	appjwt "github.com/bekontaii/Online-Shop-Go/pkg/jwt"
 	"net/http"
 	"strings"
 )
@@ -13,7 +13,6 @@ const UserIDKey contextKey = "user_id"
 
 func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -25,18 +24,20 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
+
 		if parts[0] != "Bearer" {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
+
 		token := parts[1]
-		userID, err := jwt.ValidateToken(token)
+		claims, err := appjwt.ValidateToken(token)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		ctx := context.WithValue(r.Context(), UserIDKey, userID)
-		next.ServeHTTP(w, r.WithContext(ctx))
 
+		ctx := context.WithValue(r.Context(), UserIDKey, int64(claims.UserID))
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
