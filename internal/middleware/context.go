@@ -7,6 +7,7 @@ func GetUserID(r *http.Request) (int64, bool) {
 	if value == nil {
 		return 0, false
 	}
+
 	userID, ok := value.(int64)
 	return userID, ok
 }
