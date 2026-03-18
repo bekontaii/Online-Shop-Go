@@ -40,4 +40,5 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), UserIDKey, int64(claims.UserID))
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+	// just to commit and fix issues
 }
