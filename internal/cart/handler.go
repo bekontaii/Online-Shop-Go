@@ -33,6 +33,23 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserID(r)
+	var req AddToCartRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	if !ok {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	if req.ProductID <= 0 || req.ProductID > 0 {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	err:=h.service.
+}
 func (h *Handler) CartHandler(mux *http.ServeMux) {
 	mux.Handle(
 		"/api/cart",
