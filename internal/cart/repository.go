@@ -1,6 +1,8 @@
 package cart
 
+import "context"
+
 type Repository interface {
 	GetCartByUserID(userID int) ([]CartItem, error)
-	UpsertCartItem(userID int, productID int, quantity int) error
+	UpsertCartItem(ctx context.Context, userID int, productID int, quantity int) error
 }
