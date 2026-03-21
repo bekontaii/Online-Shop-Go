@@ -24,6 +24,10 @@ func NewHandler(service *Service) *Handler {
 	}
 }
 func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 	userID, ok := middleware.GetUserID(r)
 	if !ok {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -42,6 +46,10 @@ func (h *Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 
 }
 func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
 	userID, ok := middleware.GetUserID(r)
 	if !ok {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -87,6 +95,10 @@ func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 	})
 }
 func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
 	userID, ok := middleware.GetUserID(r)
 	if !ok {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -120,5 +132,5 @@ func (h *Handler) CartHandler(mux *http.ServeMux) {
 
 	mux.Handle("/api/cart", cartHandler(http.HandlerFunc(h.GetCart)))
 	mux.Handle("/api/cart/add", cartHandler(http.HandlerFunc(h.AddToCart)))
-	mux.Handle("/api/cart/remove", cartHandler(http.HandlerFunc(h.RemoveFromCart)))
+	mux.Handle("/api/cart/delete", cartHandler(http.HandlerFunc(h.RemoveFromCart)))
 }
