@@ -3,6 +3,7 @@ package cart
 import (
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 type PostgresRepository struct {
@@ -55,4 +56,11 @@ DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity;`
 	return nil
 }
 func (r *PostgresRepository) RemoveCartItem(ctx context.Context, userID int, productID int) error {
+	query := `DELETE FROM cart WHERE user_id = $1 AND product_id = $2;`
+	_, err := r.db.ExecContext(ctx, query, userID, productID)
+	if err != nil {
+		return fmt.Errorf("failed to remove cart item: %w", err)
+	}
+	return nil
+
 }
