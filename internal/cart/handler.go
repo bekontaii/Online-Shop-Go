@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/bekontaii/Online-Shop-Go/internal/middleware"
 	"net/http"
+	"strconv"
 )
 
 var (
@@ -85,9 +86,39 @@ func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 		"status": "ok",
 	})
 }
+func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	productIDStr := r.URL.Query().Get("product_id")
+	if productIDStr == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	productID, err := strconv.Atoi(productIDStr)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	err = h.service.RemoveFromCart(r.Context(), int(userID), productID)
+	if err != nil {
+		if errors.Is(err, ErrInvalidProductID) ||
+			errors.Is(err, ErrInvalidUserID) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+	return
+}
 func (h *Handler) CartHandler(mux *http.ServeMux) {
 	cartHandler := middleware.JWTMiddleware
 
 	mux.Handle("/api/cart", cartHandler(http.HandlerFunc(h.GetCart)))
 	mux.Handle("/api/cart/add", cartHandler(http.HandlerFunc(h.AddToCart)))
+	mux.Handle("/api/cart/remove", cartHandler(http.HandlerFunc(h.RemoveFromCart)))
 }

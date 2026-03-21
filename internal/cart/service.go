@@ -23,5 +23,11 @@ func (s *Service) AddToCart(ctx context.Context, userID int, productID int, quan
 	return s.repo.UpsertCartItem(ctx, userID, productID, quantity)
 }
 func (s *Service) RemoveFromCart(ctx context.Context, userID int, productID int) error {
+	if userID <= 0 {
+		return errors.New("user_id must be greater than 0")
+	}
+	if productID <= 0 {
+		return errors.New("product_id must be greater than 0")
+	}
 	return s.repo.RemoveCartItem(ctx, userID, productID)
 }
