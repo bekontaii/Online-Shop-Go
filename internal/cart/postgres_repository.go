@@ -54,3 +54,5 @@ DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity;`
 	}
 	return nil
 }
+func (r *PostgresRepository) RemoveCartItem(ctx context.Context, userID int, productID int) error {
+}
