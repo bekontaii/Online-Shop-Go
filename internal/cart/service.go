@@ -22,3 +22,6 @@ func (s *Service) AddToCart(ctx context.Context, userID int, productID int, quan
 	}
 	return s.repo.UpsertCartItem(ctx, userID, productID, quantity)
 }
+func (s *Service) RemoveFromCart(ctx context.Context, userID int, productID int) error {
+	return s.repo.RemoveCartItem(ctx, userID, productID)
+}
