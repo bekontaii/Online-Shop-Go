@@ -31,3 +31,6 @@ func (s *Service) RemoveFromCart(ctx context.Context, userID int, productID int)
 	}
 	return s.repo.RemoveCartItem(ctx, userID, productID)
 }
+func (s *Service) UpdartCartItem(ctx context.Context, userID int, productID int, quantity int) error {
+
+}
