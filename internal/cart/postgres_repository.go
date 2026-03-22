@@ -64,3 +64,6 @@ func (r *PostgresRepository) RemoveCartItem(ctx context.Context, userID int, pro
 	return nil
 
 }
+func (r *PostgresRepository) UpdartCartItem(ctx context.Context, userID int, productID int, quantity int) error {
+	query := ``
+}
