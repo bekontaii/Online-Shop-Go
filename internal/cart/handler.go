@@ -127,10 +127,56 @@ func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 	return
 }
+func (h *Handler) UpdateCartItem(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPatch {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
+	defer r.Body.Close()
+
+	var req AddToCartRequest
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&req); err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	if req.ProductID <= 0 || req.Quantity < 0 {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err := h.service.UpdateCartItem(r.Context(), int(userID), req.ProductID, req.Quantity)
+	if err != nil {
+		if errors.Is(err, ErrInvalidQuantity) ||
+			errors.Is(err, ErrInvalidProductID) ||
+			errors.Is(err, ErrInvalidUserID) {
+
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
 func (h *Handler) CartHandler(mux *http.ServeMux) {
 	cartHandler := middleware.JWTMiddleware
 
 	mux.Handle("/api/cart", cartHandler(http.HandlerFunc(h.GetCart)))
 	mux.Handle("/api/cart/add", cartHandler(http.HandlerFunc(h.AddToCart)))
 	mux.Handle("/api/cart/delete", cartHandler(http.HandlerFunc(h.RemoveFromCart)))
+	mux.Handle("/api/cart/update", cartHandler(http.HandlerFunc(h.UpdateCartItem)))
 }
