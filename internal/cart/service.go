@@ -31,6 +31,20 @@ func (s *Service) RemoveFromCart(ctx context.Context, userID int, productID int)
 	}
 	return s.repo.RemoveCartItem(ctx, userID, productID)
 }
-func (s *Service) UpdartCartItem(ctx context.Context, userID int, productID int, quantity int) error {
+func (s *Service) UpdateCartItem(ctx context.Context, userID int, productID int, quantity int) error {
+	if userID <= 0 {
+		return ErrInvalidUserID
+	}
+	if productID <= 0 {
+		return ErrInvalidProductID
+	}
+	if quantity < 0 {
+		return ErrInvalidQuantity
+	}
 
+	if quantity == 0 {
+		return s.repo.RemoveCartItem(ctx, userID, productID)
+	}
+
+	return s.repo.UpdateCartItem(ctx, userID, productID, quantity)
 }

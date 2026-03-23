@@ -64,6 +64,17 @@ func (r *PostgresRepository) RemoveCartItem(ctx context.Context, userID int, pro
 	return nil
 
 }
-func (r *PostgresRepository) UpdartCartItem(ctx context.Context, userID int, productID int, quantity int) error {
-	query := ``
+func (r *PostgresRepository) UpdateCartItem(ctx context.Context, userID int, productID int, quantity int) error {
+	query := `
+		UPDATE cart
+		SET quantity = $3
+		WHERE user_id = $1 AND product_id = $2
+	`
+
+	_, err := r.db.ExecContext(ctx, query, userID, productID, quantity)
+	if err != nil {
+		return fmt.Errorf("update cart item: %w", err)
+	}
+
+	return nil
 }
