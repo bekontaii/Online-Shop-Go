@@ -9,3 +9,6 @@ func NewService(repo Repository) *Service {
 		repo: repo,
 	}
 }
+func (s *Service) CreateProduct() {
+	s.repo.CreateProduct()
+}
