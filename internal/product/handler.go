@@ -2,6 +2,7 @@ package product
 
 import (
 	"encoding/json"
+	"github.com/bekontaii/Online-Shop-Go/internal/middleware"
 	"net/http"
 )
 
@@ -27,5 +28,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	role := Get
 }
