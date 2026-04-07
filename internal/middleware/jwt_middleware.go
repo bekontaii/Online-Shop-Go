@@ -10,6 +10,7 @@ import (
 type contextKey string
 
 const UserIDKey contextKey = "user_id"
+const UserRoleKey contextKey = "user_role"
 
 func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
