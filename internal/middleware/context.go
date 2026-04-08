@@ -12,9 +12,10 @@ func GetUserID(r *http.Request) (int64, bool) {
 	return userID, ok
 }
 func GetUserRole(r *http.Request) (string, bool) {
-	value := r.URL.Query().Get(string(UserRoleKey))
+	value := r.Context().Value(UserRoleKey)
 	if value == "" {
 		return "", false
 	}
-	return value, true
+	role, ok := value.(string)
+	return role, ok
 }
