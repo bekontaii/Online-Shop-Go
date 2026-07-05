@@ -45,10 +45,10 @@ func (r *PostgresRepository) GetCartByUserID(userID int) ([]CartItem, error) {
 	return items, nil
 }
 func (r *PostgresRepository) UpsertCartItem(ctx context.Context, userID int, productID int, quantity int) error {
-	query := `INSERT INTO cart (user_id, product_id, quantity)
+	query := `INSERT INTO cart_items (user_id, product_id, quantity)
 VALUES ($1, $2, $3)
 ON CONFLICT (user_id, product_id)
-DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity;`
+DO UPDATE SET quantity = cart_items.quantity + EXCLUDED.quantity;`
 	_, err := r.db.ExecContext(ctx, query, userID, productID, quantity)
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ DO UPDATE SET quantity = cart.quantity + EXCLUDED.quantity;`
 	return nil
 }
 func (r *PostgresRepository) RemoveCartItem(ctx context.Context, userID int, productID int) error {
-	query := `DELETE FROM cart WHERE user_id = $1 AND product_id = $2;`
+	query := `DELETE FROM cart_items WHERE user_id = $1 AND product_id = $2;`
 	_, err := r.db.ExecContext(ctx, query, userID, productID)
 	if err != nil {
 		return fmt.Errorf("failed to remove cart item: %w", err)
@@ -66,7 +66,7 @@ func (r *PostgresRepository) RemoveCartItem(ctx context.Context, userID int, pro
 }
 func (r *PostgresRepository) UpdateCartItem(ctx context.Context, userID int, productID int, quantity int) error {
 	query := `
-		UPDATE cart
+		UPDATE cart_items
 		SET quantity = $3
 		WHERE user_id = $1 AND product_id = $2
 	`
